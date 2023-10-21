@@ -1,0 +1,3 @@
+Link DockerHub : https://hub.docker.com/repository/docker/sheikap/item-app/general
+
+Link GitHub    : https://github.com/SheikapRaya/a433-microservices/tree/proyek-pertama
