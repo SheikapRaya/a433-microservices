@@ -1,0 +1,49 @@
+#Set versi kubernetes
+apiVersion: apps/v1
+
+#Set kubernetes object = Deployment
+kind: Deployment
+
+#Set Metadata = nama & label
+metadata:
+  name: back-end
+  labels:
+    app: back-end 
+
+#Set disared state spec & selector & template
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app: back-end
+  template:
+    metadata:
+      labels:
+        app: back-end
+        
+#Set Container spec & port & database
+    spec:
+      containers:
+        - name: back-end
+          image: ghcr.io/sheikapraya/karsajobs-ui:latest
+          ports:
+            - containerPort: 8080
+ #Set Environment           
+          env:
+          # Port
+            - name: APP_PORT
+              value: "8080"
+          # Mongo Service    
+            - name: MONGO_HOST
+              value: mongo
+          # Mongo Secret    
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-credentials
+                  key: MONGO_ROOT_USERNAME
+            - name: MONGO_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-credentials
+                  key: MONGO_ROOT_PASSWORD

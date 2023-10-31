@@ -1,0 +1,33 @@
+#Set versi kubernetes
+apiVersion: apps/v1
+
+#Set kubernetes object = Deployment
+kind: Deployment
+
+#Set Metadata = nama & labels
+metadata:
+  name: front-end
+  labels:
+    app: front-end
+
+#Set disared state spec selector & template
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front-end
+  template:
+    metadata:
+      labels:
+        app: front-end
+
+#Set Container spec & port & backend node IP dan node port
+    spec:
+      containers:
+        - name: front-end
+          image: ghcr.io/sheikapraya/karsajobs-ui:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: VUE_APP_BACKEND
+              value: 10.107.238.176:8080

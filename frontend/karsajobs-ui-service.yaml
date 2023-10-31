@@ -1,0 +1,21 @@
+#Set versi kubernetes
+apiVersion: v1
+
+#Set kubernetes object = service
+kind: Service
+
+#Set Metadata = nama & label
+metadata:
+  name: front-end
+  labels:
+    app: front-end
+
+#Type network : nodeport untuk karsajobs
+spec:
+  type: NodePort
+  selector:
+    app: front-end
+  ports:
+    - port: 8000
+      nodePort: 31000
+      targetPort: 8000
