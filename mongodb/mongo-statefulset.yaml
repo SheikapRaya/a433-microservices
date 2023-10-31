@@ -1,0 +1,71 @@
+#Set versi kubernetes
+apiVersion: apps/v1
+
+#Set kubernetes object = StatefulSet
+kind: StatefulSet
+
+#Set Metadata = nama & labels
+metadata:
+  name: mongo
+  labels:
+    app: mongo
+
+#Set disared state spec selector,service name & template    
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+      tier: backend
+  serviceName: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+        tier: backend
+
+#Set Container spec & Database configuration
+    spec:
+      containers:
+        - image: mongo:4.4.3
+          name: mongo
+          #init mongo username and password
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME_FILE
+              value: /etc/mongo-credentials/MONGO_ROOT_USERNAME
+            - name: MONGO_INITDB_ROOT_PASSWORD_FILE
+              value: /etc/mongo-credentials/MONGO_ROOT_PASSWORD
+          #Set database containar name & ports
+          ports:
+            - containerPort: 27017
+              name: mongo
+          #Set konfigurasi mount volume
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data/db
+            - name: mongo-config-map
+              mountPath: /config
+            - name: mongo-credentials
+              mountPath: /etc/mongo-credentials     
+      #Set konfigurasi volumes
+      volumes:
+      # mongo pvc
+        - name: mongo-persistent-storage
+          persistentVolumeClaim:
+            claimName: mongo-pv-claim
+      # mongo config-map     
+        - name: mongo-config-map
+          configMap:
+            name: mongo-config
+            items: 
+              - key: mongo.conf
+                path: mongo.conf
+       # mongo secreet         
+        - name: mongo-credentials
+          secret:
+            secretName: mongo-credentials
+            items: 
+            - key: MONGO_ROOT_USERNAME
+              path: MONGO_ROOT_USERNAME
+            - key: MONGO_ROOT_PASSWORD
+              path: MONGO_ROOT_PASSWORD

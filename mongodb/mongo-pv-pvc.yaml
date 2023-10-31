@@ -1,0 +1,43 @@
+#Set versi kubernetes
+apiVersion: v1
+
+#Set kubernetes object = PersistentVolume
+kind: PersistentVolume
+
+#Set Metadata = nama & labels
+metadata:
+  name: mongo-pv
+  labels:
+    type: local
+
+#Set disared state spec name,capacity,access mode,path
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/data/db"
+
+---
+#Set versi kubernetes
+apiVersion: v1
+
+#Set kubernetes object = PersistentVolumeClaim
+kind: PersistentVolumeClaim
+
+#Set Metadata = nama & labels
+metadata:
+  name: mongo-pv-claim
+  labels:
+    app: mongo
+
+#Set disared state spec name,access mode,capacity 
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

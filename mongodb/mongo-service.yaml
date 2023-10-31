@@ -1,0 +1,21 @@
+#Set versi kubernetes
+apiVersion: v1
+
+#Set kubernetes object = Service
+kind: Service
+
+#Set Metadata = nama & labels
+metadata:
+  name: mongo
+  labels:
+    app: mongo
+
+#Set ports & Selector
+spec:
+  ports:
+  - port: 27017
+    protocol: TCP
+  selector:
+    app: mongo
+    tier: backend
+  clusterIP: None

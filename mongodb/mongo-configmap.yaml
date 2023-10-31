@@ -1,0 +1,13 @@
+#Set versi kubernetes
+apiVersion: v1
+
+#Set kubernetes object = ConfigMap
+kind: ConfigMap
+
+#Set Metadata = nama & database confuguration
+metadata:
+  name: mongo-config
+data:
+  mongo.conf: |
+    storage:
+      dbPath: /data/db
