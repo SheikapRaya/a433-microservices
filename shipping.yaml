@@ -1,0 +1,87 @@
+  #Set versi kubernetes
+apiVersion: v1
+
+#Set kubernetes object = Service
+kind: Service
+
+#Set Metadata = nama & label
+metadata:
+  name: shipping
+  labels:
+    app: shipping
+    service: shipping
+#Set spec network , port , selector
+spec:
+  ports:
+  - port: 3001
+    name: http
+  selector:
+    app: shipping
+---
+
+#Set versi kubernetes
+apiVersion: apps/v1
+
+#Set kubernetes object = Deployment
+kind: Deployment
+
+#Set Metadata = nama & label
+metadata:
+  name: shipping
+  labels:
+    app: shipping 
+    version: v2
+
+#Set disared state spec & selector & template
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app: shipping
+
+  template:
+    metadata:
+      labels:
+        app: shipping
+
+        
+#Set Container spec
+    spec:
+      containers:
+      #Set nama container      
+        - name: shipping
+      #Set pull image dari GHCR sesuai saran ke "2"        
+          image: ghcr.io/sheikapraya/shipping-service:latest
+
+          #Set container image port
+          ports:
+          - containerPort: 3001
+
+#Set Environment
+          env:
+
+          #Set Rabbitmq Host
+            - name: RABBIT_HOST 
+              value: "rabbitmq-cluster.rabbitmq.svc.cluster.local"
+          
+          #Set Rabbitmq port
+            - name: RABBIT_PORT
+              value: "5672"
+
+          #Set Rabbitmq username dari berkas rabbitmq-secret.yaml
+            - name: RABBIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBIT_USERNAME
+          
+          #Set Rabbitmq password dari berkas rabbitmq-secret.yaml
+            - name: RABBIT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBIT_PASSWORD
+                  
+          #Set AMQP_URL untuk rabbitmq dari file cluster.yaml
+            - name: AMQP_URL
+              value: "amqp://rabbitmq-cluster.rabbitmq.svc.cluster.local:5672"

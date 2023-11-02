@@ -1,0 +1,87 @@
+#Set versi kubernetes
+apiVersion: v1
+
+#Set kubernetes object = Service
+kind: Service
+
+#Set Metadata = nama & label
+metadata:
+  name: order
+  labels:
+    app: order
+    service: order
+#Set spec network,port,selector
+spec:
+  ports:
+  - port: 3000
+    name: http
+  selector:
+    app: order
+---
+#Set versi kubernetes
+apiVersion: apps/v1
+
+#Set kubernetes object = Deployment
+kind: Deployment
+
+#Set Metadata = nama & label
+metadata:
+  name: order
+  labels:
+    app: order 
+    version: v1
+
+#Set disared state spec & selector & template
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app: order
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: order
+        version: v1
+        
+#Set Container spec
+    spec:
+      containers:
+
+#Set nama container      
+        - name: order
+
+#Set pull image dari GHCR sesuai saran ke "2"        
+          image: ghcr.io/sheikapraya/order-service:latest
+          ports:
+
+#Set container image port
+          - containerPort: 3000
+
+#Set Environment
+          env:
+          #Set Rabbitmq Host
+            - name: RABBIT_HOST 
+              value: "rabbitmq-cluster.rabbitmq.svc.cluster.local"
+
+          #Set Rabbitmq port
+            - name: RABBIT_PORT
+              value: "5672"
+              
+          #Set Rabbitmq username dari berkas rabbitmq-secret.yaml
+            - name: RABBIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBIT_USERNAME
+
+          #Set Rabbitmq password dari berkas rabbitmq-secret.yaml
+            - name: RABBIT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBIT_PASSWORD
+
+          #Set AMQP_URL untuk rabbitmq dari file cluster.yaml
+            - name: AMQP_URL
+              value: "amqp://rabbitmq-cluster.rabbitmq.svc.cluster.local:5672"

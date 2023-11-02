@@ -1,0 +1,56 @@
+#Set versi kubernetes
+apiVersion: networking.istio.io/v1alpha3
+
+#Set kubernetes object = Gateway
+kind: Gateway
+
+#Set Metadata = nama
+metadata:
+  name: order-gateway
+
+#Set spesifikasi selector
+spec:
+  selector:
+    istio: ingressgateway
+
+#Set server port & protocol
+  servers:
+    - port:
+        number: 80
+        name: http
+        name: http
+        protocol: HTTP
+#Set i & o dari semua host
+      hosts:
+        - "*"
+---
+#Set versi kubernetes
+apiVersion: networking.istio.io/v1alpha3
+
+#Set kubernetes object = VirtualService
+kind: VirtualService
+
+#Set Metadata = nama
+metadata:
+  name: order
+
+#Set spesifikasi i & o host & gateways
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - order-gateway
+
+#http.match.uri.exact adalah /order sesuai tips
+  http:
+  - match:
+    - uri:
+        exact: /order
+
+#Set http.match.route.destination.host adalah nama Kubernetes Service untuk order service sesuai tips
+    route:
+    - destination:
+        host: order
+        port:
+        #port 3000 untuk order-service
+          number: 3000

@@ -1,0 +1,50 @@
+  #Versi docker compose
+version: "3.2"
+  #Service pertama
+services:
+  rabbitmq:
+
+  #Menentukan Image
+
+    image: rabbitmq:3.8-management-alpine
+
+  #Menentukan desirate state container nama,port,volume,jaringan
+
+    container_name: 'rabbitmq_container'
+    ports:
+        - 5673:5672
+        - 15673:15672
+    volumes:
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+        - rabbitmq_network
+
+  #Service kedua
+  shipping:                
+
+  # Menggunakan image shipping-service dari GitHub Packages
+    image : ghcr.io/sheikapraya/shipping-service:latest
+
+  # Nama container
+    container_name: shipping
+
+  #Menunda hingga container rabbitmq berjalan
+    depends_on:
+      - "rabbitmq"
+
+  #menjalankan script index.js  
+    command: 'node index.js'
+
+  #Menentukan desirate state environment AMQP,port,network
+    environment:
+      AMQP_URL: amqp://guest:guest@rabbitmq:5672
+      PORT: 3001
+    ports:
+
+      - 3001:3001
+    networks:
+      - rabbitmq_network
+networks:
+  rabbitmq_network:
+    driver: bridge

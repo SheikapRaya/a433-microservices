@@ -1,0 +1,43 @@
+ #Set versi kubernetes
+apiVersion: rabbitmq.com/v1beta1
+
+#Set kubernetes object = RabbitmqCluster
+kind: RabbitmqCluster
+
+#Set Metadata = nama 
+metadata:
+  name: rabbitmq-cluster
+
+#Set spesifikasi untuk rabbit cluster
+spec:
+  replicas: 3
+  override:
+    statefulSet:
+      spec:
+        podManagementPolicy: OrderedReady
+#Set tipe ip
+  service:
+    type: ClusterIP
+#Set tipe volume
+  persistence:
+    storageClassName: standard
+    storage: 20Gi
+#Set affinity,label,value   
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - rabbitmq-cluster
+        topologyKey: kubernetes.io/hostname
+#Set plugin Tambahan untuk rabbitmq        
+  rabbitmq:
+    additionalPlugins:
+    - rabbitmq_federation
+#Set config Tambahan untuk rabbitmq 
+    additionalConfig: |
+      disk_free_limit.absolute = 500MB
+      vm_memory_high_watermark.relative = 0.6
