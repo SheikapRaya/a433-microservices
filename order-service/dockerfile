@@ -1,0 +1,20 @@
+#Menentukan Image
+FROM node:14.21.3
+
+#Menentukan direktori kerja
+WORKDIR /app
+
+#Copy seluruh file ke direktori kerja
+COPY . .
+
+#Menginstall kebutuhan Aplikasi
+RUN npm install
+
+#Ketentuan port sesuai tips
+ENV PORT=3000
+
+#Expose port 3000
+EXPOSE 3000
+
+# Memulai script index.js
+CMD ["npm", "start"]
